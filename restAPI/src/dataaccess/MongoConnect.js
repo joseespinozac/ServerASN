@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/practicapp", {
-    userNewUrlParser: true,
+mongoose.connect("mongodb+srv://jet23:zHnhqC3rCLiOIl44@asndb-wzeae.mongodb.net/asndb?retryWrites=true&w=majority", {
     useUnifiedTopology: true,
     useCreateIndex: true,
     useNewUrlParser: true
