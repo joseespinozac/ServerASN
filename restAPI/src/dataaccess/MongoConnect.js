@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-mongoose.connect("mongodb+srv://jet23:zHnhqC3rCLiOIl44@asndb-wzeae.mongodb.net/asndb?retryWrites=true&w=majority", {
+const config = require("../config");
+mongoose.connect(config.MONGODB_CONNECTION_STRING, {
     useUnifiedTopology: true,
     useCreateIndex: true,
     useNewUrlParser: true
