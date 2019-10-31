@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node src/app.js & mocha",
+    "start": "node src/app.js"
   },
   "author": "José Alberto, Jethran Enrique y Ulises",
   "license": "ISC",
