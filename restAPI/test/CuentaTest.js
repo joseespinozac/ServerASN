@@ -3,18 +3,19 @@ const fetch   = require('node-fetch');
 const chai = require('chai');
 const mongoose = require('mongoose');
 const chaiHttp = require('chai-http');
-const server = require('../src/app');
+//const server = require('../src/app');
 const Cuenta = require('../src/dataaccess/model/Cuenta');
 const should = chai.should();
 
+const SERVER = ""
 
 chai.use(chaiHttp);
 
 describe('cuentas', () => {
-    Cuenta.collection.drop();
+    /*Cuenta.collection.drop();
 
-    describe('POST', (done) => {
-        it('Should create a new Cuenta and return json', () => {
+    describe('POST', () => {
+        it('Should create a new Cuenta and return json', function(done) {
             
             chai.request(server)
                 .post('/api/Cuenta/')
@@ -29,19 +30,24 @@ describe('cuentas', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
+                    done();
                 });
             
         });
         
-    });
-    describe('GET', (done) => {
-        it('Should return json as default data format', () => {
-            
-            chai.request(server)
+    });*/
+    describe('GET', function() {
+        it('Should return json as default data format', function(done) {
+            chai.request("http://localhost:8080")
                 .get('/api/Cuenta/')
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('array');
+                    if(err) {
+                        done(err);
+                    } else {
+                        res.should.have.status(200);
+                        res.body.should.be.a('array');
+                        done();
+                    }
                 });
             
         });
