@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cuentaRouter = require("./api.cuenta.route");
-const emailCtrl = require("../DB/model/email");
+const emailCtrl = require("../dataaccess/model/email");
 const config = require("../config");
 
 

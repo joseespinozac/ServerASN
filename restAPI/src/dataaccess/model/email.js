@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 var express = require('express');
 var router = express.Router();
-const Usuario = require('./Usuario');
+const Cuenta = require('./Cuenta');
 
 router.post('/:id', function (req, res) {
     var toEmail = req.body.emailTo;
@@ -15,12 +15,12 @@ router.post('/:id', function (req, res) {
         }
     });
 
-    Usuario.findById({
+    Cuenta.findById({
         _id: jsonId
     }, function (err, docs) {
         if (err) {
             res.status(500).json({
-                "mensaje": "Hubo un error al recuperar al usuario"
+                "mensaje": "Hubo un error al recuperar la Cuenta"
             })
             console.error(err);
             return;
