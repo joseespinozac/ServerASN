@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
                 "message": "Hubo un error al ejecutar la consulta"
             })
             console.error(err);
-            return
+            return;
         }
 
         res.json(docs);
