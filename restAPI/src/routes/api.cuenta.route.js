@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Cuenta = require("../dataaccess/model/Cuenta");
+const Usuario = require("../dataaccess/model/Usuario");
+const mongoose = require('../dataaccess/MongoConnect');
 const jwt = require("jsonwebtoken");
 
 router.get("/", (req, res) => {
-    Cuenta.find(function(err, docs){
+    Cuenta.find().populate('usuarioAsociado').exec(function(err, docs){
         if(err){
             res.status(500).json({
                 "message": "Hubo un error al ejecutar la consulta"
@@ -35,6 +37,7 @@ router.post("/", (req, res) => {
     var pin = "123"
 
     var cuenta = new Cuenta({
+        _id: new mongoose.Types.ObjectId(),
         nombre: nombre,
         apellido: apellido,
         usuario: usuario,
@@ -42,22 +45,41 @@ router.post("/", (req, res) => {
         telefono: telefono,
         password: password,
         isVerified: false,
-        pin: pin
+        pin: pin,
+        usuarioAsociado: ''
        
-    })
+    });
+
+    usuarioAsociado = new Usuario({
+        _id: new mongoose.Types.ObjectId(),
+        foto_perfil: '',
+        descripcion: '',
+        cuentaAsociada: cuenta._id
+    });
+
+    cuenta.usuarioAsociado = usuarioAsociado._id;
+
+
 
     cuenta.save(function(err, doc) {
         if(err) {
             res.status(500).json({
-                message: "Error al guardar"
+                message: "Error al guardar cuenta"
             })
             console.error(err);
             return;
         }
+        usuarioAsociado.save(function (err) {
+            if(err) {
+                res.status(500).json({
+                    message: "Error al guardar usuario de cuenta"
+                })
+                console.error(err);
+                return;
+            }
+        })
         res.json(doc);
     });
-
-    
 });
 
 router.put("/:id", (req, res) => {
@@ -84,7 +106,7 @@ router.put("/:id", (req, res) => {
         usuario: usuario,
         correo: correo,
         telefono: telefono,
-        password: password,
+        password: password
     }, function(err, doc){
         if(err) {
             res.status(500).json({
@@ -99,19 +121,49 @@ router.put("/:id", (req, res) => {
 });
 
 router.delete("/:id", (req, res) => {
-    var jsonId = req.params.id;
+    var idCuenta = req.params.id;
 
     Cuenta.findOneAndDelete({
-        _id: jsonId
-    }, function (err, doc){
+        _id: idCuenta
+    }, function (err, cuenta){
         if(err) {
             res.status(500).json({
-                message: "Error al ejecutar delete"
+                message: "Error al eliminar cuenta"
             })
             console.error(err);
             return;
         }
-        res.json(doc);
+        console.log(cuenta);
+
+        //TODO
+        if(cuenta){
+            var idUsuarioAsociado = cuenta.usuarioAsociado[0];
+            Usuario.findOneAndDelete({
+                _id: idUsuarioAsociado
+            }, function(err, usuario) {
+                if(err) {
+                    res.status(500).json({
+                        message: "Error al eliminar usuario de cuenta"
+                    })
+                    console.error(errr);
+                    return;
+                }
+
+                if(usuario){
+                    res.json("Cuenta y usuario eliminados");
+                } else {
+                    res.status(404).json({
+                        message: "No se encontro el usuario de la cuenta solicitada"
+                    });
+                }
+
+                
+            })
+        } else {
+            res.status(404).json({
+                message: "No se encontro la cuenta solicitada"
+            });
+        }
     });
 });
 
@@ -127,7 +179,7 @@ router.post("/login", (req, res) => {
     }
 
 
-    Usuario.findOne({
+    Cuenta.find({
         correo: correo,
         password: password
     }, function (err, doc) {
@@ -159,6 +211,42 @@ router.post("/login", (req, res) => {
             });
         }
     })
+});
+
+router.put("/modUsuario/:idCuenta", (req, res) => { 
+    var foto_perfil = req.body.foto_perfil;
+    var descripcion = req.body.descripcion;
+
+    var jsonId = req.params.idCuenta;
+    Cuenta.findOne({
+        _id: jsonId
+    }, function (err, cuenta) {
+        if(err) {
+            res.status(500).json({
+                message: "Error al ejecutar consulta"
+            })
+            console.error(err);
+            return;
+        }
+        if(cuenta) {
+            var idUsuarioAsociado = cuenta.usuarioAsociado[0];
+            Usuario.findOneAndUpdate({
+                _id: idUsuarioAsociado
+            }, {
+                foto_perfil: foto_perfil,
+                descripcion: descripcion
+            }, function(err, doc){
+                if(err) {
+                    res.status(500).json("Error al ejecutar update de usuario");
+                }
+                if(doc){
+                    res.json("Exito para modificar info de usuario");
+                }
+            });
+        }
+
+    });
+    
 });
 
 

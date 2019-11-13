@@ -1,5 +1,6 @@
 const mongoose = require("../MongoConnect");
 const Schema = mongoose.Schema;
+const Usuario = require("./Usuario");
 
 var CuentaSchema = new Schema({
     nombre:{
@@ -39,7 +40,8 @@ var CuentaSchema = new Schema({
     pin:{
         required: true,
         type: String
-    }
+    },
+    usuarioAsociado: [{type: Schema.Types.ObjectId, ref: 'Usuario'}]
 
 })
 

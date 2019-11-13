@@ -31,11 +31,10 @@ describe('cuentas', () => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
                     done();
-                });
-            
-        });
-        
+                });       
+        });    
     });*/
+    
     describe('GET', function() {
         it('Should return json as default data format', function(done) {
             chai.request("http://localhost:8080")
@@ -49,10 +48,6 @@ describe('cuentas', () => {
                         done();
                     }
                 });
-            
-        });
-        
-    });
-
-    
+        });  
+    });  
 });
