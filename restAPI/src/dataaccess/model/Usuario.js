@@ -1,6 +1,5 @@
 const mongoose = require("../MongoConnect");
 const Schema = mongoose.Schema;
-const Cuenta = require('./Cuenta');
 
 var UsuarioSchema = new Schema({
     foto_perfil: {

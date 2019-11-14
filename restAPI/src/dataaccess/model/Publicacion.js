@@ -17,12 +17,7 @@ var PublicacionSchema = new Schema({
         type: String,
         trim: true
     },
-    _idUsuario:{
-        required:true,
-        type: String,
-        trim: true
-    }
-
+    usuario: [{type: Schema.Types.ObjectId, ref: 'Usuario'}]
 })
 
 var Publicacion = mongoose.model('Publicacion', PublicacionSchema);

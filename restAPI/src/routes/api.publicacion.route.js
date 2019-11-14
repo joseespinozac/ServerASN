@@ -3,7 +3,9 @@ const router = express.Router();
 const Publicacion = require("../dataaccess/model/Publicacion");
 
 router.get("/", (req, res) => {
-    Publicacion.find(function(err, docs){
+    Publicacion.find().
+    populate('usuarioAsociado').
+    exec(function(err, docs){
         if(err){
             res.status(500).json({
                 "message": "Hubo un error al ejecutar la consulta"
@@ -17,11 +19,13 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
     var fotoUrl = req.body.fotoUrl;
-    var fechaCarga = req.body.fechaCarga;
+    var fechaCarga = new Date(Date.now()).toISOString();
     var descripcion = req.body.descripcion;
-    var _idUsuario = req.body._idUsuario;
+    var idUsuario = req.body.idUsuario;
 
-    if(fotoUrl === undefined || fechaCarga === undefined || descripcion === undefined || _idUsuario === undefined){
+    console.log(fotoUrl + " " + fechaCarga + " " + descripcion + " " + idUsuario);
+
+    if(fotoUrl === undefined || fechaCarga === undefined || descripcion === undefined || idUsuario === undefined){
         res.status(400).json({
             "message": "Parametros invalido o incompletos"
         })
@@ -32,7 +36,7 @@ router.post("/", (req, res) => {
         fotoUrl: fotoUrl,
         fechaCarga: fechaCarga,
         descripcion: descripcion,
-        _idUsuario: _idUsuario
+        usuario: idUsuario
     })
 
     publicacion.save(function(err, doc){
@@ -47,13 +51,12 @@ router.post("/", (req, res) => {
     })
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:idPublicacion", (req, res) => {
     var fotoUrl = req.body.fotoUrl;
-    var fechaCarga = req.body.fechaCarga;
     var descripcion = req.body.descripcion;
-    var _idUsuario = req.body._idUsuario;
+    var idPublicacion = req.params.idPublicacion;
 
-    if(fotoUrl === undefined || fechaCarga === undefined || descripcion === undefined || _idUsuario === undefined){
+    if(fotoUrl === undefined || descripcion === undefined){
         res.status(400).json({
             "message": "Parametros invalido o incompletos"
         })
@@ -61,12 +64,10 @@ router.put("/:id", (req, res) => {
     }
 
     Publicacion.findOneAndUpdate({
-        _id: jsonId
+        _id: idPublicacion 
     }, {
         fotoUrl: fotoUrl,
-        fechaCarga: fechaCarga,
-        descripcion: descripcion,
-        _idUsuario: _idUsuario
+        descripcion: descripcion
     }, function(err, doc){
         if(err) {
             res.status(500).json({
@@ -75,6 +76,7 @@ router.put("/:id", (req, res) => {
             console.error(err);
             return;
         }
+        res.json(doc);
     });
 
 });
