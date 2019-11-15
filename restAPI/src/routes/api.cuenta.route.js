@@ -4,6 +4,7 @@ const Cuenta = require("../dataaccess/model/Cuenta");
 const Usuario = require("../dataaccess/model/Usuario");
 const mongoose = require('../dataaccess/MongoConnect');
 const jwt = require("jsonwebtoken");
+const config = require("../config");
 
 router.get("/", (req, res) => {
     Cuenta.find().populate('usuarioAsociado').exec(function(err, docs){
@@ -50,7 +51,7 @@ router.post("/", (req, res) => {
        
     });
 
-    usuarioAsociado = new Usuario({
+    var usuarioAsociado = new Usuario({
         _id: new mongoose.Types.ObjectId(),
         foto_perfil: '',
         descripcion: '',
@@ -58,7 +59,6 @@ router.post("/", (req, res) => {
     });
 
     cuenta.usuarioAsociado = usuarioAsociado._id;
-
 
 
     cuenta.save(function(err, doc) {
@@ -77,7 +77,7 @@ router.post("/", (req, res) => {
                 console.error(err);
                 return;
             }
-        })
+        });
         res.json(doc);
     });
 });
@@ -94,7 +94,7 @@ router.put("/:id", (req, res) => {
     if(usuario === undefined || password === undefined || nombre === undefined || apellido === undefined || correo === undefined || telefono === undefined) {
         res.status(400).json({
             "message": "Parametros invalidos o incompletos"
-        })
+        });
         return;
     }
 
@@ -137,7 +137,7 @@ router.delete("/:id", (req, res) => {
 
         //TODO
         if(cuenta){
-            var idUsuarioAsociado = cuenta.usuarioAsociado[0];
+            var idUsuarioAsociado = cuenta.usuarioAsociado;
             Usuario.findOneAndDelete({
                 _id: idUsuarioAsociado
             }, function(err, usuario) {
@@ -229,7 +229,7 @@ router.put("/modUsuario/:idCuenta", (req, res) => {
             return;
         }
         if(cuenta) {
-            var idUsuarioAsociado = cuenta.usuarioAsociado[0];
+            var idUsuarioAsociado = cuenta.usuarioAsociado;
             Usuario.findOneAndUpdate({
                 _id: idUsuarioAsociado
             }, {
@@ -241,6 +241,7 @@ router.put("/modUsuario/:idCuenta", (req, res) => {
                 }
                 if(doc){
                     res.json("Exito para modificar info de usuario");
+                    
                 }
             });
         }

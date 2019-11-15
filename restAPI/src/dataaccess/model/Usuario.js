@@ -12,7 +12,7 @@ var UsuarioSchema = new Schema({
         type: String,
         trim: true
     },
-    cuentaAsociada:[{type: Schema.Types.ObjectId, ref: 'Cuenta'}]
+    cuentaAsociada:{type: Schema.Types.ObjectId, ref: 'Cuenta'}
 
 });
 

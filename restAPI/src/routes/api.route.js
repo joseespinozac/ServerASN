@@ -3,6 +3,7 @@ const router = express.Router();
 const cuentaRouter = require("./api.cuenta.route");
 const usuarioRouter = require("./api.usuario.route");
 const publicacionRouter = require("./api.publicacion.route");
+const solicitudRouter = require("./api.solicitud.route");
 //const emailCtrl = require("../dataaccess/model/email");
 const config = require("../config");
 
@@ -11,6 +12,7 @@ const config = require("../config");
 router.use("/Cuenta", cuentaRouter);
 router.use("/Usuario", usuarioRouter);
 router.use("/Publicacion", publicacionRouter);
+router.use("/Solicitud", solicitudRouter);
 router.get("/ping", (req, res) => {
 
     res.status(200).json({

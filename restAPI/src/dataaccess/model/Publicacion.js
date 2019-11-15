@@ -17,7 +17,9 @@ var PublicacionSchema = new Schema({
         type: String,
         trim: true
     },
-    usuario: [{type: Schema.Types.ObjectId, ref: 'Usuario'}]
+    usuario: {type: Schema.Types.ObjectId, ref: 'Usuario'},
+    comentarios: [{type: Schema.Types.ObjectId, ref: 'Comentario'}],
+    reacciones: [{type: Schema.Types.ObjectId, ref: 'Reaccion'}]
 })
 
 var Publicacion = mongoose.model('Publicacion', PublicacionSchema);
