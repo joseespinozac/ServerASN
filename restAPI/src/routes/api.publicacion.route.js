@@ -4,6 +4,7 @@ const mongoose = require("../dataaccess/MongoConnect");
 const Publicacion = require("../dataaccess/model/Publicacion");
 const Comentario = require("../dataaccess/model/Comentario");
 const Reaccion = require("../dataaccess/model/Reaccion");
+const ListaFavorito = require("../dataaccess/model/ListaFavorito");
 
 var reacciones = {
     MEGUSTA: 1,
@@ -203,6 +204,10 @@ router.put("/nuevareaccion/:idPublicacion", (req, res) => {
             });
         }
     });
+});
+
+router.put("/agregafavorito/:idUsuario", (req, res) => {
+    var idPublicacion = req.params.idPublicacion;
 });
 
 module.exports = router;

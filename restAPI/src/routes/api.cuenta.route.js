@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Cuenta = require("../dataaccess/model/Cuenta");
 const Usuario = require("../dataaccess/model/Usuario");
+const ListaFavorito = require("../dataaccess/model/ListaFavorito");
 const mongoose = require('../dataaccess/MongoConnect');
 const jwt = require("jsonwebtoken");
 const config = require("../config");
@@ -58,25 +59,38 @@ router.post("/", (req, res) => {
         cuentaAsociada: cuenta._id
     });
 
+    var listaFavoritos = new ListaFavorito({
+        usuario = usuarioAsociado._id
+    });
+
     cuenta.usuarioAsociado = usuarioAsociado._id;
 
 
-    cuenta.save(function(err, doc) {
-        if(err) {
+    cuenta.save(function(errCuenta, doc) {
+        if(errCuenta) {
             res.status(500).json({
                 message: "Error al guardar cuenta"
-            })
-            console.error(err);
+            });
+            console.error(errCuenta);
             return;
         }
-        usuarioAsociado.save(function (err) {
-            if(err) {
+        usuarioAsociado.save(function (errUsuario) {
+            if(errUsuario) {
                 res.status(500).json({
                     message: "Error al guardar usuario de cuenta"
-                })
-                console.error(err);
+                });
+                console.error(errUsuario);
                 return;
             }
+            listaFavoritos.save(function (errLista) {
+                if(errLista) {
+                    res.status(500).json({
+                        message: "Error al iniciar lista de favoritos"
+                    });
+                    console.error(errLista);
+                    return;
+                }
+            })
         });
         res.json(doc);
     });
