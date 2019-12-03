@@ -21,11 +21,8 @@ var estados = {
 router.get("/:idUsuario", (req, res) => {
     var idUsuario = req.params.idUsuario;
     Solicitud.find({
-        usuarioRecibe: idUsuario 
-    }).
-        populate('usuarioEnvia').
-        populate('usuarioRecibe').
-        exec(function(err, docs){
+        $or:[{usuarioEnvia: idUsuario}, {usuarioRecibe: idUsuario}]
+    }).exec(function(err, docs){
             if(err){
                 res.status(500).json({
                     "message": "Hubo un error al consultar las solicitudes"
@@ -36,6 +33,39 @@ router.get("/:idUsuario", (req, res) => {
 
             res.json(docs);
         });
+});
+
+//Get amigos de un usuario
+router.get("/amigos/:idUsuario", (req, res) => {
+
+    let listaAmigos = [];
+    var idUsuario = req.params.idUsuario;
+
+    Solicitud.find({
+        $and:[{$or:[{usuarioEnvia: idUsuario}, {usuarioRecibe: idUsuario}]},
+         {estadoSolicitud: estados.properties[3].estado}]
+    }).
+    exec(function(err, docs){
+        if(err){
+            res.status(500).json({
+                "message": "Hubo un error al consultar las solicitudes"
+            });
+            console.error(err);
+            return;
+        }
+        if(docs) {
+            docs.forEach(solicitud => {
+                if(solicitud.usuarioEnvia == idUsuario) {
+                    listaAmigos.push(solicitud.usuarioRecibe);
+                } else {
+                    listaAmigos.push(solicitud.usuarioEnvia);
+                }
+            });
+
+            res.json(listaAmigos);
+        }
+
+    });
 });
 
 router.post("/", (req, res) => {

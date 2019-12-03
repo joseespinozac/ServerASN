@@ -15,11 +15,12 @@ var reacciones = {
         1: {reaccion: "me gusta"},
         2: {reaccion: "me molesta"},
         3: {reaccion: "me encanta"},
-        4: {reaccion: "me enllora"}
+        4: {reaccion: "me entristece"}
     }
 }
 
 router.get("/", (req, res) => {
+
     Publicacion.find().
     populate('usuarioAsociado').
     populate('comentarios').
@@ -34,6 +35,57 @@ router.get("/", (req, res) => {
         }
         res.json(docs);
     });
+});
+
+//Traer por partes las publicaciones de un usuario en particular
+router.get("/feedusuario/:idUsuario", (req, res) => {
+    var usuarioAsociado = req.params.idUsuario;
+    var inicioSegmento = req.body.inicioSegmento;
+    console.log(usuarioAsociado);
+    console.log(inicioSegmento);
+    Publicacion.find({
+        usuario: usuarioAsociado
+    }).
+    skip(inicioSegmento).
+    limit(10).
+    exec(function(err, docs) {
+        if(err){
+            res.status(500).json({
+                "message": "Hubo un error al consultar publis"
+            })
+            console.error(err);
+            return;
+        }
+        res.json(docs);
+    });
+});
+
+//Traer por partes las publicaciones recientes de los amigos del usuario
+router.get("/feedfotos", (req, res) => {
+    var listaAmigos = req.body.listaAmigos;
+    var inicioSegmento = req.body.inicioSegmento;
+    
+    console.log(req.body);
+    console.log(listaAmigos);
+    console.log(inicioSegmento);
+    
+    Publicacion.find({
+        usuario : {$in : listaAmigos}
+    }).
+    sort([['_id', -1]]).
+    skip(inicioSegmento).
+    limit(20).
+    exec(function(err, docs) {
+        if(err){
+            res.status(500).json({
+                "message": "Hubo un error al consultar las publicaciones"
+            })
+            console.error(err);
+            return;
+        }
+        console.log(docs);
+        res.json(docs);
+    })
 });
 
 router.post("/", (req, res) => {

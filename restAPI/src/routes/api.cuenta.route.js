@@ -8,7 +8,8 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 
 router.get("/", (req, res) => {
-    Cuenta.find().populate('usuarioAsociado').exec(function(err, docs){
+    Cuenta.find().
+        exec(function(err, docs){
         if(err){
             res.status(500).json({
                 "message": "Hubo un error al ejecutar la consulta"
@@ -60,7 +61,7 @@ router.post("/", (req, res) => {
     });
 
     var listaFavoritos = new ListaFavorito({
-        usuario = usuarioAsociado._id
+        usuario: usuarioAsociado._id
     });
 
     cuenta.usuarioAsociado = usuarioAsociado._id;
@@ -182,42 +183,44 @@ router.delete("/:id", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-    var correo = req.body.correo;
+    var usuario = req.body.usuario;
     var password = req.body.password;
 
-    if (!correo || !password) {
+    if (!usuario || !password) {
         res.status(400).json({
             message: "Invalid body params"
         })
-        return
+        return;
     }
 
 
-    Cuenta.find({
-        correo: correo,
+    Cuenta.findOne({
+        usuario: usuario,
         password: password
     }, function (err, doc) {
 
         if (err) {
             res.status(500).json({
                 message: "Error en la BD"
-            })
-            console.error(err)
-            return
+            });
+            console.error(err);
+            return;
         }
         if (doc) {
             var tokenPayload = {
                 _id: doc._id,
                 username: doc.username
             }
-
+            console.log(doc);
             var token = jwt.sign(tokenPayload, config.TOKEN_SECRET, {
                 expiresIn: 60 * 60 * 24 * 7 // Expira en una semana
-            })
+            });
 
             res.json({
-                token: token
-            })
+                token: token,
+                idCuenta: doc._id,
+                idUsuario: doc.usuarioAsociado
+            });
 
         } else {
             res.status(401).json({
