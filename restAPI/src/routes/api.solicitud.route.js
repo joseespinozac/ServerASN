@@ -30,6 +30,7 @@ router.get("/:idUsuario", (req, res) => {
                 console.error(err);
                 return;
             }
+            
 
             res.json(docs);
         });

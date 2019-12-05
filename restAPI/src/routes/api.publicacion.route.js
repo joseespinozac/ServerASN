@@ -6,6 +6,11 @@ const Comentario = require("../dataaccess/model/Comentario");
 const Reaccion = require("../dataaccess/model/Reaccion");
 const ListaFavorito = require("../dataaccess/model/ListaFavorito");
 
+var multer, storage, path, crypto;
+multer = require('multer')
+path = require('path');
+crypto = require('crypto');
+
 var reacciones = {
     MEGUSTA: 1,
     MEMOLESTA: 2,
@@ -22,7 +27,7 @@ var reacciones = {
 router.get("/", (req, res) => {
 
     Publicacion.find().
-    populate('usuarioAsociado').
+    populate({path: 'usuarioAsociado', select: ['name', '_id']}).
     populate('comentarios').
     populate('reacciones').
     exec(function(err, docs){
@@ -61,7 +66,7 @@ router.get("/feedusuario/:idUsuario", (req, res) => {
 });
 
 //Traer por partes las publicaciones recientes de los amigos del usuario
-router.get("/feedfotos", (req, res) => {
+router.post("/feedfotos", (req, res) => {
     var listaAmigos = req.body.listaAmigos;
     var inicioSegmento = req.body.inicioSegmento;
     
@@ -72,9 +77,11 @@ router.get("/feedfotos", (req, res) => {
     Publicacion.find({
         usuario : {$in : listaAmigos}
     }).
+    populate('comentarios').
+    populate('reacciones').
     sort([['_id', -1]]).
     skip(inicioSegmento).
-    limit(20).
+    limit(10).
     exec(function(err, docs) {
         if(err){
             res.status(500).json({
@@ -87,6 +94,8 @@ router.get("/feedfotos", (req, res) => {
         res.json(docs);
     })
 });
+
+
 
 router.post("/", (req, res) => {
     var fotoUrl = req.body.fotoUrl;
@@ -121,6 +130,76 @@ router.post("/", (req, res) => {
         res.json(doc);
     })
 });
+
+//Parte de subida de imagenes
+
+var form = "<!DOCTYPE HTML><html><body>" +
+"<form method='post' action='http://localhost:8080/api/Publicacion/upload' enctype='multipart/form-data'>" +
+"<input type='file' name='upload'/>" +
+"<input type='submit' /></form>" +
+"</body></html>";
+
+router.get('/form', function (req, res){
+    res.writeHead(200, {'Content-Type': 'text/html' });
+    res.end(form);
+});
+
+var fs = require('fs');
+
+
+storage = multer.diskStorage({
+destination: './uploads/',
+filename: function(req, file, cb) {
+    return crypto.pseudoRandomBytes(16, function(err, raw) {
+    if (err) {
+        return cb(err);
+    }
+    return cb(null, "" + (raw.toString('hex')) + (path.extname(file.originalname)));
+    });
+}
+});
+
+router.post("/upload", multer({
+      storage: storage
+    }).single('imagen'), function(req, res, err) {
+      console.log(req.file);
+      console.log(req.body.upload);
+      var fechaCarga = new Date(Date.now()).toISOString();
+      console.log(req.file.filename);
+
+      var publicacion = new Publicacion({
+        fotoUrl: req.file.filename,
+        fechaCarga: fechaCarga,
+        descripcion: "descripcion",
+        usuario: req.body.upload
+        });
+
+        publicacion.save(function(err, doc){
+            if(err) {
+                res.status(500).json({
+                    "message": "Error al guardar publicación"
+                });
+                console.error(err);
+                return;
+            }
+            res.status(200).json(doc);
+        });
+      
+    });
+  
+  router.get('/uploads/:upload', function (req, res){
+    file = req.params.upload;
+    console.log(req.params.upload);
+    let ruta = path.resolve('../restApi/uploads/' + file);
+    var img = fs.readFileSync(ruta);
+    var img64 = Buffer.from(data, 'base64');
+    res.writeHead(200, {'Content-Type': 'image/png' });
+    res.end(img);
+  
+  });
+  
+
+//Parte subida de imagenes end
 
 router.put("/:idPublicacion", (req, res) => {
     var fotoUrl = req.body.fotoUrl;
