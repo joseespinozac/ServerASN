@@ -13,14 +13,8 @@ crypto = require('crypto');
 
 var reacciones = {
     MEGUSTA: 1,
-    MEMOLESTA: 2,
-    MEENCANTA: 3,
-    MEENLLORA: 4,
     properties: {
-        1: {reaccion: "me gusta"},
-        2: {reaccion: "me molesta"},
-        3: {reaccion: "me encanta"},
-        4: {reaccion: "me entristece"}
+        1: {reaccion: "me gusta"}
     }
 }
 
@@ -51,6 +45,16 @@ router.get("/feedusuario/:idUsuario", (req, res) => {
     Publicacion.find({
         usuario: usuarioAsociado
     }).
+    populate({
+        path: 'comentarios',
+        populate: {
+            path: 'usuario',
+            model: 'Usuario'
+        }
+    }).
+    populate('reacciones').
+    populate('usuario').
+    sort([['_id', -1]]).
     skip(inicioSegmento).
     limit(10).
     exec(function(err, docs) {
@@ -77,8 +81,15 @@ router.post("/feedfotos", (req, res) => {
     Publicacion.find({
         usuario : {$in : listaAmigos}
     }).
-    populate('comentarios').
+    populate({
+        path: 'comentarios',
+        populate: {
+            path: 'usuario',
+            model: 'Usuario'
+        }
+    }).
     populate('reacciones').
+    populate('usuario').
     sort([['_id', -1]]).
     skip(inicioSegmento).
     limit(10).
@@ -163,15 +174,15 @@ router.post("/upload", multer({
       storage: storage
     }).single('imagen'), function(req, res, err) {
       console.log(req.file);
-      console.log(req.body.upload);
+      var uploadInfo = JSON.parse(req.body.upload);
+      console.log(uploadInfo);
       var fechaCarga = new Date(Date.now()).toISOString();
-      console.log(req.file.filename);
 
       var publicacion = new Publicacion({
         fotoUrl: req.file.filename,
         fechaCarga: fechaCarga,
-        descripcion: "descripcion",
-        usuario: req.body.upload
+        descripcion: uploadInfo.descripcion,
+        usuario: uploadInfo.idUsuario
         });
 
         publicacion.save(function(err, doc){
@@ -255,6 +266,9 @@ router.put("/nuevocomentario/:idPublicacion", (req, res) => {
 
     var idPublicacion = req.params.idPublicacion;
 
+    console.log(comentario);
+    console.log(idUsuario);
+    console.log(idPublicacion);
     if(comentario === undefined || idUsuario === undefined || idPublicacion === undefined) {
         res.status(400).json({
             "message": "Parametros invalidos o incompletos"
@@ -287,7 +301,12 @@ router.put("/nuevocomentario/:idPublicacion", (req, res) => {
                     console.error(err);
                     return;
                 }
-                res.json(comentario);
+
+                Comentario.populate(comentario, {path: 'usuario'}, function(err, com){
+                    res.json(comentario);
+                });
+                
+                
             });
         }
     });
@@ -317,7 +336,7 @@ router.put("/nuevareaccion/:idPublicacion", (req, res) => {
     {strict: false}, (err, publicacion) => {
         if(err) {
             res.status.json({
-                "message": "Error al asociar comentario"
+                "message": "Error al asociar reaccion"
             });
             console.error(err);
             return;
@@ -326,7 +345,7 @@ router.put("/nuevareaccion/:idPublicacion", (req, res) => {
             reaccion.save(function(err, reaccion) {
                 if(err) {
                     res.status.json({
-                        "message": "Error al guardar comentario"
+                        "message": "Error al guardar reaccion"
                     });
                     console.error(err);
                     return;
@@ -337,8 +356,57 @@ router.put("/nuevareaccion/:idPublicacion", (req, res) => {
     });
 });
 
-router.put("/agregafavorito/:idUsuario", (req, res) => {
+router.delete("/delComentario/:idComentario", (req, res) => {
+    var idComentario = req.params.idComentario;
+
+    Comentario.findOneAndDelete({
+        _id: idComentario
+    }, function(err, docs){
+        if(err){
+            res.status(500).json({
+                "message": "Error al eliminar comentario de bd"
+            });
+        }
+        res.json(docs);
+    });
+
+});
+
+router.delete("/delReaccion/:idReaccion", (req, res) => {
+    var idReaccion = req.params.idReaccion;
+    Reaccion.findOneAndDelete({
+        _id: idReaccion
+    }, function(err, docs){
+        if(err){
+            res.status(500).json({
+                "message": "Error al eliminar reacción de bd"
+            });
+        }
+        res.json(docs);
+    });
+
+});
+
+router.put("/agregafavorito/:idUsuario/:idPublicacion", (req, res) => {
     var idPublicacion = req.params.idPublicacion;
+    var idUsuario = req.params.idUsuario;
+
+    ListaFavorito.findOneAndUpdate({
+        usuario: idUsuario
+    }, 
+    {$push: {'favoritos': idPublicacion }},
+    {strict: false}, (err, doc) => {
+        if(err) {
+            res.status.json({
+                "message": "Error al agregar publicación a favoritos"
+            });
+            console.error(err);
+            return;
+        }
+
+        res.json(doc);
+    });
+
 });
 
 module.exports = router;

@@ -57,6 +57,7 @@ router.post("/", (req, res) => {
         _id: new mongoose.Types.ObjectId(),
         foto_perfil: '',
         descripcion: '',
+        nombrePublico: cuenta.usuario,
         cuentaAsociada: cuenta._id
     });
 
@@ -106,9 +107,13 @@ router.put("/:id", (req, res) => {
     var correo = req.body.correo;
     var telefono = req.body.telefono;
 
-    if(usuario === undefined || password === undefined || nombre === undefined || apellido === undefined || correo === undefined || telefono === undefined) {
+    if(usuario === undefined || password === undefined ||
+         nombre === undefined || apellido === undefined ||
+          correo === undefined || telefono === undefined) {
+
         res.status(400).json({
             "message": "Parametros invalidos o incompletos"
+        
         });
         return;
     }
