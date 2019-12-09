@@ -52,7 +52,13 @@ router.get("/feedusuario/:idUsuario", (req, res) => {
             model: 'Usuario'
         }
     }).
-    populate('reacciones').
+    populate({
+        path: 'reacciones',
+        populate: {
+            path: 'usuario',
+            model: 'Usuario'
+        }
+    }).
     populate('usuario').
     sort([['_id', -1]]).
     skip(inicioSegmento).
@@ -88,7 +94,13 @@ router.post("/feedfotos", (req, res) => {
             model: 'Usuario'
         }
     }).
-    populate('reacciones').
+    populate({
+        path: 'reacciones',
+        populate: {
+            path: 'usuario',
+            model: 'Usuario'
+        }
+    }).
     populate('usuario').
     sort([['_id', -1]]).
     skip(inicioSegmento).
