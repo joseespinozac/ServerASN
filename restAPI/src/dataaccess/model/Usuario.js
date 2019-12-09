@@ -12,6 +12,11 @@ var UsuarioSchema = new Schema({
         type: String,
         trim: true
     },
+    nombrePublico: {
+        requires: false,
+        type: String,
+        trim: true
+    },
     cuentaAsociada:{type: Schema.Types.ObjectId, ref: 'Cuenta'}
 
 });
