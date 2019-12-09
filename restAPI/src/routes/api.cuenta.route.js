@@ -49,7 +49,8 @@ router.post("/", (req, res) => {
         password: password,
         isVerified: false,
         pin: pin,
-        usuarioAsociado: ''
+        usuarioAsociado: '',
+        isModerador: false
        
     });
 
@@ -219,7 +220,8 @@ router.post("/login", (req, res) => {
             res.json({
                 token: token,
                 idCuenta: doc._id,
-                idUsuario: doc.usuarioAsociado
+                idUsuario: doc.usuarioAsociado,
+                moderado: doc.isModerador
             });
 
         } else {

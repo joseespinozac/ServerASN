@@ -1,54 +1,68 @@
 const express = require('express');
 const router = express.Router();
-const moderador = require("../dataaccess/model/Moderador");
+const Cuenta = require("../dataaccess/model/Cuenta");
+const mongoose = require('../dataaccess/MongoConnect');
+
 
 router.get("/", (req, res) => {
-    moderador.find(function (err, docs) {
-        if (err) {
-            res.status(500).json({
-                "mensaje": "Hubo un error al ejecutar la consulta"
-            })
-            console.error(err);
-            return;
-        }
+    Cuenta.find().
+        exec(function (err, docs) {
+            if (err) {
+                res.status(500).json({
+                    "message": "Hubo un error al ejecutar la consulta"
+                })
+                console.error(err);
+                return;
+            }
 
-        res.json(docs);
-    });
+            res.json(docs);
+        });
 });
 
-router.post("/", (req, res) => {
-    //recuperar las variables del cuerpo de la peticion
-    var username = req.body.username
-    var password = req.body.password
 
-    //verificar que existan
-    if (username == undefined || password == undefined) {
-        res.status(401).json({
-            "mensage": "Invalid body parms"
+router.post("/addModerador", (req, res )=>{
+
+    var usuario = req.body.usuario;
+    var password = req.body.password;
+    var nombre = req.body.nombre;
+    var apellido = req.body.apellido;
+    var correo = req.body.correo;
+    var telefono = req.body.telefono;
+
+    if (usuario === undefined || password === undefined || nombre === undefined || apellido === undefined || correo === undefined || telefono === undefined) {
+        res.status(400).json({
+            "message": "Parametros invalidos o incompletos"
         })
         return;
     }
 
-    //Crear objeto moderador
-    var moderador = new moderador({
-        username: username,
-        password: password
+    var pin = "123"
+
+    var cuenta = new Cuenta({
+        _id: new mongoose.Types.ObjectId(),
+        nombre: nombre,
+        apellido: apellido,
+        usuario: usuario,
+        correo: correo,
+        telefono: telefono,
+        password: password,
+        isVerified: false,
+        pin: pin,
+        isModerador: true
+
     });
 
-    //ejecutamos guardar y verificamos el resultado
-    moderador.save(function (err, docs) {
-        if (err) {
+    cuenta.save(function (errCuenta, doc) {
+        if (errCuenta) {
             res.status(500).json({
-                "mensaje": "Error al ejecutar save"
-            })
-
-            console.error(err);
+                message: "Error al guardar cuenta"
+            });
+            console.error(errCuenta);
             return;
         }
-
-        res.json(docs);
+        res.json(doc);
     });
-});
 
+});
 
 module.exports = router;

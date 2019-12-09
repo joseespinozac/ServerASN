@@ -41,6 +41,10 @@ var CuentaSchema = new Schema({
         required: true,
         type: String
     },
+    isModerador: {
+        required: true,
+        type: Boolean,
+    },
     usuarioAsociado: {type: Schema.Types.ObjectId, ref: 'Usuario'}
 
 })
