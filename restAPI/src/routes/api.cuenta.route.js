@@ -226,7 +226,7 @@ router.post("/login", (req, res) => {
                 token: token,
                 idCuenta: doc._id,
                 idUsuario: doc.usuarioAsociado,
-                moderado: doc.isModerador
+                isModerador: doc.isModerador
             });
 
         } else {

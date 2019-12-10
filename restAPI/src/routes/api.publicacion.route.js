@@ -37,14 +37,10 @@ router.get("/", (req, res) => {
 });
 
 //Traer por partes las publicaciones de un usuario en particular
-router.get("/feedusuario/:idUsuario", (req, res) => {
-    var usuarioAsociado = req.params.idUsuario;
+router.post("/feedmoderador/", (req, res) => {
     var inicioSegmento = req.body.inicioSegmento;
-    console.log(usuarioAsociado);
     console.log(inicioSegmento);
-    Publicacion.find({
-        usuario: usuarioAsociado
-    }).
+    Publicacion.find().
     populate({
         path: 'comentarios',
         populate: {
@@ -327,6 +323,8 @@ router.put("/nuevocomentario/:idPublicacion", (req, res) => {
 router.put("/nuevareaccion/:idPublicacion", (req, res) => {
     var tipo = req.body.reaccion;
     var idUsuario = req.body.idUsuario;
+
+    console.log(req.body);
 
     var idPublicacion = req.params.idPublicacion;
 
