@@ -6,7 +6,7 @@ var ReaccionSchema = new Schema({
         required: true,
         type: String
     },
-    usuario: {type: Schema.Types.ObjectId, ref: 'Reaccion'}
+    usuario: {type: Schema.Types.ObjectId, ref: 'Usuario'}
 })
 
 var Reaccion = mongoose.model('Reaccion', ReaccionSchema);

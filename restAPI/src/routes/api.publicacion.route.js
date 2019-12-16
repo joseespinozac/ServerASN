@@ -360,7 +360,9 @@ router.put("/nuevareaccion/:idPublicacion", (req, res) => {
                     console.error(err);
                     return;
                 }
-                res.json(reaccion);
+                Reaccion.populate(reaccion, {path: 'usuario'}, function(err, reac){
+                    res.json(reaccion);
+                });
             });
         }
     });

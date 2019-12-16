@@ -82,7 +82,7 @@ router.post("/", (req, res) => {
     var solicitud = new Solicitud({
         usuarioEnvia: usuarioEnviaId,
         usuarioRecibe: usuarioRecibeId,
-        estadoSolicitud: estados.properties[estados.PENDIENTE].estado
+        estadoSolicitud: estados.properties[estados.ACEPTADA].estado
     });
 
     solicitud.save(function(err, doc) {

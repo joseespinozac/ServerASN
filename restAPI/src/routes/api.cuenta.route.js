@@ -22,6 +22,52 @@ router.get("/", (req, res) => {
     });
 });
 
+router.get("/buscarCuenta/:nombreusuario", (req, res) => {
+    var nombreusuario = req.params.nombreusuario;
+    Cuenta.findOne({
+        usuario: nombreusuario
+    }).exec(function(err, cuenta) {
+        if(err){
+            res.status(500).json({
+                "message": "Error al consultar usuario"
+            });
+            console.log(err);
+            return;
+        }
+        if(cuenta) {
+            Cuenta.populate(cuenta, {path: 'usuarioAsociado', select: ['foto_perfil', 'descripcion']}, function(err, cue){
+                console.log(cue);
+                res.json(cue); 
+            });
+        }
+    });
+});
+
+router.get("/MiCuenta/:idCuenta", (req, res) => {
+    var jsonId = req.params.idCuenta;
+    console.log(jsonId);
+    
+    Cuenta.findOne({
+        _id: jsonId
+    }, function(err, cuenta) {
+        if(err){
+            console.log("hola2");
+            res.status(500).json({
+                "message": "Error al consultar usuario"
+            });
+            console.log(err);
+            return;
+        }
+        if(cuenta) {
+            console.log("hola2");
+            Cuenta.populate(cuenta, {path: 'usuarioAsociado', select: ['foto_perfil', 'descripcion']}, function(err, cue){
+                console.log(cue);
+                res.json(cue); 
+            });
+        }
+    });
+});
+
 router.post("/", (req, res) => {
     var usuario = req.body.usuario;
     var password = req.body.password;
