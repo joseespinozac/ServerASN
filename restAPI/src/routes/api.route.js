@@ -5,6 +5,7 @@ const usuarioRouter = require("./api.usuario.route");
 const publicacionRouter = require("./api.publicacion.route");
 const solicitudRouter = require("./api.solicitud.route");
 const moderadorRouter = require("./api.moderador.route");
+const chatGroupRouter = require("./api.chat.route");
 //const emailCtrl = require("../dataaccess/model/email");
 const config = require("../config");
 
@@ -15,6 +16,7 @@ router.use("/Usuario", usuarioRouter);
 router.use("/Publicacion", publicacionRouter);
 router.use("/Solicitud", solicitudRouter);
 router.use("/Moderador", moderadorRouter);
+router.use("/ChatGroup", chatGroupRouter);
 
 router.get("/ping", (req, res) => {
 
