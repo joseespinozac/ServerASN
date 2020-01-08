@@ -35,7 +35,7 @@ router.post('/save', (req, res) => {
             console.error(err);
             return;
         }
-        res.json(chatgroup);    
+        res.json(chatgroup.populate('members.member'));    
     });
 });
 

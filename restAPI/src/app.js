@@ -6,6 +6,7 @@ const config = require("./config");
 const morgan = require('morgan');
 
 app.use(bodyParser.json({limit: '10mb'}));
+
 //app.use(morgan("dev"));
 app.use("/api", apiRoute);
 

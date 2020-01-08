@@ -237,6 +237,7 @@ router.delete("/:id", (req, res) => {
 router.post("/login", (req, res) => {
     var usuario = req.body.usuario;
     var password = req.body.password;
+    console.log(usuario, password);
 
     if (!usuario || !password) {
         res.status(400).json({
@@ -272,6 +273,7 @@ router.post("/login", (req, res) => {
                 token: token,
                 idCuenta: doc._id,
                 idUsuario: doc.usuarioAsociado,
+                usuario: doc.usuario,
                 isModerador: doc.isModerador
             });
 
