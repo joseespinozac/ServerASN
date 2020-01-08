@@ -22,6 +22,22 @@ router.get('/:idUsuario', (req, res) => {
     });
 });
 
+router.get('/getGroup/:idChat', (res, req) => {
+    let idChat = req.params.idChat;
+    ChatGroup.findOne({ _id : idChat }).
+        populate('members.member').
+        exec(function (err, chatgroups) {
+            if (err) {
+                res.status(500).json({
+                    "message": "Hubo un error al ejecutar la consulta"
+                });
+                console.error(err);
+                return;
+            }
+            res.json(chatgroups);
+        });
+});
+
 router.post('/save', (req, res) => {
     let members = req.body.members;
     let chatgroup = new ChatGroup({
