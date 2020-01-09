@@ -22,20 +22,21 @@ router.get('/:idUsuario', (req, res) => {
     });
 });
 
-router.get('/getGroup/:idChat', (res, req) => {
+router.get('/getGroup/:idChat', (req, res) => {
     let idChat = req.params.idChat;
-    ChatGroup.findOne({ _id : idChat }).
-        populate('members.member').
-        exec(function (err, chatgroups) {
-            if (err) {
-                res.status(500).json({
-                    "message": "Hubo un error al ejecutar la consulta"
-                });
-                console.error(err);
-                return;
-            }
-            res.json(chatgroups);
-        });
+
+    ChatGroup.findOne({ _id: idChat }).
+    populate('members.member').
+    exec(function(err, chatgroup){
+        if(err){
+            res.status(500).json({
+                "message": "Hubo un error al ejecutar la consulta"
+            });
+            console.error(err);
+            return;
+        }
+        res.json(chatgroup);
+    });
 });
 
 router.post('/save', (req, res) => {
